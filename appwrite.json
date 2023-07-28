@@ -1,0 +1,21 @@
+{
+    "projectId": "64bb9962998fbe2e05ee",
+    "projectName": "Threads",
+    "functions": [
+        {
+            "$id": "64bbf89d3d4952fb7239",
+            "name": "getUser",
+            "runtime": "node-16.0",
+            "path": "functions/getUser",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}
