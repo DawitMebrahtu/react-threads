@@ -12,6 +12,7 @@ const Thread = ({thread, setThreads}) => {
 	const [loading, setLoading] = useState(true)
 	const [owner, setOwner] = useState()
 	const [threadInstance, setThreadInstance] = useState(thread)
+	const currentUserId = "64bb9d704e6dac9e9a0a"
 
 	useEffect (() =>{
 		getUserInfo()
@@ -98,6 +99,7 @@ const Thread = ({thread, setThreads}) => {
 							 onClick={toggleLike}
 							 size={20}
 							 className="cursor-pointer"
+							 color = {threadInstance.users_who_liked.includes(currentUserId) ? '#ff0000':"#fff"}
 							  />
 							<Repeat size={20} />
 							<Send size={20} />
