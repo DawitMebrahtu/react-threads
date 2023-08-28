@@ -3,12 +3,14 @@ import {Image} from 'react-feather'
 import Thread from '../components/Thread'
 import {database, storage, DEV_DB_ID, VITE_COLLECTION_ID, BUCKET_ID_IMAGES} from '../appwriteConfig'
 import {Query, ID} from 'appwrite'
-
+import {useAuth} from '../context/AuthContext'
 
 const Feed = () => {
 	const [threads, setThreads] = useState([])
 	const [threadBody, setThreadBody] = useState('')
 	const [threadImage, setThreadImage] = useState(null)
+	const {user} = useAuth()
+
 	const fileRef = useRef(null)
 
 	useEffect( () => {
@@ -30,7 +32,7 @@ const Feed = () => {
 		e.preventDefault()
 
 		const payload = {
-			"owner_id": "64bb9d704e6dac9e9a0a",
+			"owner_id": user.$id,
 			"body": threadBody,
 			"image": threadImage
 		}

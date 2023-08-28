@@ -1,10 +1,11 @@
 import React, {useState, useEffect} from 'react'
 import {MoreHorizontal, Heart, Repeat, Send, MessageCircle, Trash2} from 'react-feather'
-import {functions, database, DEV_DB_ID, VITE_COLLECTION_ID} from '../appwriteConfig'
+import {functions, database, DEV_DB_ID, VITE_COLLECTION_ID, COLLECTION_ID_PROFILES} from '../appwriteConfig'
 import TimeAgo from 'javascript-time-ago';
 import ReactTimeAgo from 'react-time-ago';
-
+import {useAuth} from '../context/AuthContext'
 import en from 'javascript-time-ago/locale/en.json'
+import {Link} from 'react-router-dom'
 
 TimeAgo.addDefaultLocale(en)
 
@@ -12,7 +13,8 @@ const Thread = ({thread, setThreads}) => {
 	const [loading, setLoading] = useState(true)
 	const [owner, setOwner] = useState()
 	const [threadInstance, setThreadInstance] = useState(thread)
-	const currentUserId = "64bb9d704e6dac9e9a0a"
+
+	const {user} = useAuth()
 
 	useEffect (() =>{
 		getUserInfo()
@@ -23,9 +25,16 @@ const Thread = ({thread, setThreads}) => {
 			"owner_id": thread.owner_id
 		}
 
-		const response = await functions.createExecution('64bbf89d3d4952fb7239', JSON.stringify(payload))
-		const userData = JSON.parse(response.response)
 
+		const response = await functions.createExecution(
+			'64bbf89d3d4952fb7239', //Function ID
+			JSON.stringify(payload))
+		const profile = await database.getDocument(DEV_DB_ID, COLLECTION_ID_PROFILES,thread.owner_id);
+		//console.log('Profile in Thread Is: ', profile.profile_pic)
+
+		const userData = JSON.parse(response.response)
+		userData['profile_pic'] = profile.profile_pic
+		console.log('USername: ', userData.profile_pic)
 		setOwner(userData)
 		setLoading(false)
 	}
@@ -41,15 +50,15 @@ const Thread = ({thread, setThreads}) => {
 		console.log('Liked')
 
 		const users_who_liked = thread.users_who_liked
-		const currentUserId = "64bb9d704e6dac9e9a0a"
+		//const user.$id = "64bb9d704e6dac9e9a0a"
 
-		if (users_who_liked.includes(currentUserId)){
-			const index = users_who_liked.indexOf(currentUserId)
+		if (users_who_liked.includes(user.$id)){
+			const index = users_who_liked.indexOf(user.$id)
 			users_who_liked.splice((index,1))
 
 		}
 		else{
-			users_who_liked.push(currentUserId)
+			users_who_liked.push(user.$id)
 		}
 
 		const payload = {
@@ -72,9 +81,12 @@ const Thread = ({thread, setThreads}) => {
 
 	return (
 				<div className="flex p-2">
-					<img className="w-10 h-10 rounded-full object-cover"
-					 src={owner.profile_pic}
-					 />
+					<Link to={`/profile/${owner.$id}`}>
+						<img className="w-10 h-10 rounded-full object-cover"
+						 src={owner.profile_pic}
+						 />
+					</Link>
+
 					<div className="w-full px-4 pb-4 border-b border-[rgba(49,49,50,1)]">
 						{/* Thread Header */}
 						<div className="flex justify-between ">
@@ -99,7 +111,7 @@ const Thread = ({thread, setThreads}) => {
 							 onClick={toggleLike}
 							 size={20}
 							 className="cursor-pointer"
-							 color = {threadInstance.users_who_liked.includes(currentUserId) ? '#ff0000':"#fff"}
+							 color = {threadInstance.users_who_liked.includes(user.$id) ? '#ff0000':"#fff"}
 							  />
 							<Repeat size={20} />
 							<Send size={20} />
